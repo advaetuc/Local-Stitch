@@ -1,0 +1,19 @@
+# Environments
+.venv/
+env/
+
+# IDEs
+.vscode/
+
+# Caches & Compiled Python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# PyInstaller Build Files
+build/
+dist/
+*.spec
+
+# App-Specific Temp Files
+*.tmp
