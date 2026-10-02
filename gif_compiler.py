@@ -163,7 +163,7 @@ class App(customtkinter.CTk):
         )
         self.width_entry.pack(fill="x", padx=16, pady=8)
 
-        self.progress_bar = customtkinter.CTkProgressBar(self, from_=0, to=1)
+        self.progress_bar = customtkinter.CTkProgressBar(self)
         self.progress_bar.set(0)
         self.progress_bar.pack(fill="x", padx=16, pady=(8, 4))
 
