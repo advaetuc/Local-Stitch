@@ -92,7 +92,7 @@ def test_one_image_renders_scaled_with_aspect_ratio(tmp_path):
     path = make_image(tmp_path / "only.png", size=(80, 40))
     output = str(tmp_path / "single.gif")
 
-    render([path], output, fps=10, slider=50, max_width=40)
+    render([path], output, fps=10, slider=50, scale=0.5)
 
     with Image.open(output) as rendered:
         assert rendered.size == (40, 20)

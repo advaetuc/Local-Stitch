@@ -5,10 +5,13 @@ Compile an ordered folder of still images into an animated GIF.
 ## Use
 
 1. Install Python 3.10 or newer.
-2. Install the required packages with `pip install -r requirements.txt`.
-3. Start the app with `python gif_compiler.py`.
-4. Choose an image directory, set FPS and compression, and optionally enter a maximum width.
-5. Select the GIF destination in Save As and choose **RENDER & EXPORT GIF**. Use **Cancel** to stop a render.
+2. Open a terminal in the project folder and create an isolated virtual environment:
+   - **Windows:** `python -m venv .venv` then activate with `.\.venv\Scripts\activate`
+   - **macOS/Linux:** `python3 -m venv .venv` then activate with `source .venv/bin/activate`
+3. Install the required packages with `pip install -r requirements.txt`[cite: 3].
+4. Start the app with `python gif_compiler.py`[cite: 3].
+5. Choose an image directory, set FPS and compression, and optionally enter a maximum width[cite: 3].
+6. Select the GIF destination in Save As and choose **RENDER & EXPORT GIF**[cite: 3]. Use **Cancel** to stop a render[cite: 3].
 
 ## Known limitations
 

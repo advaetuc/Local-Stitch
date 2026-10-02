@@ -52,10 +52,10 @@ def fit_frame(path, size):
         im = ImageOps.pad(im, size, method=Image.Resampling.LANCZOS, color=BG)
     return im
 
-def target_size(first_path, max_width=None):
-    w, h = load_rgb(first_path).size
-    if max_width and w > max_width:
-        h = max(1, round(h * max_width / w)); w = max_width
+def target_size(first_path, scale: float = 1.0):
+    orig_w, orig_h = load_rgb(first_path).size
+    w = max(1, round(orig_w * scale))
+    h = max(1, round(orig_h * scale))
     return (w, h)
 
 def build_palette(paths, size, colors):
@@ -70,8 +70,8 @@ def build_palette(paths, size, colors):
         montage.paste(thumb, (k * tw, 0))
     return montage.quantize(colors, method=Image.Quantize.MEDIANCUT)
 
-def render(paths, out_path, fps, slider, max_width=None, progress=None, cancel=None):
-    size = target_size(paths[0], max_width)
+def render(paths, out_path, fps, slider, scale: float = 1.0, progress=None, cancel=None):
+    size = target_size(paths[0], scale)
     ref = build_palette(paths, size, color_count(slider))
     durs = frame_durations(fps, len(paths))
     n = len(paths)
@@ -102,7 +102,7 @@ class App(customtkinter.CTk):
         customtkinter.set_default_color_theme("blue")
         super().__init__()
 
-        self.title("Sequence-to-GIF Compiler")
+        self.title("Local Stitch")
         self.geometry("450x720")
         self.resizable(False, False)
 
@@ -158,10 +158,17 @@ class App(customtkinter.CTk):
         )
         self.compression_label.pack(fill="x", padx=16, pady=(0, 8))
 
-        self.width_entry = customtkinter.CTkEntry(
-            self, placeholder_text="Max width (px, optional)"
+        self.scale_slider = customtkinter.CTkSlider(
+            self, from_=10, to=100, number_of_steps=90,
+            command=self._update_scale
         )
-        self.width_entry.pack(fill="x", padx=16, pady=8)
+        self.scale_slider.set(100)
+        self.scale_slider.pack(fill="x", padx=16, pady=(8, 4))
+
+        self.scale_label = customtkinter.CTkLabel(
+            self, text="Scale: 100%", anchor="w"
+        )
+        self.scale_label.pack(fill="x", padx=16, pady=(0, 8))
 
         self.progress_bar = customtkinter.CTkProgressBar(self)
         self.progress_bar.set(0)
@@ -276,6 +283,9 @@ class App(customtkinter.CTk):
             text=f"Compression {slider}% → {color_count(slider)} colors"
         )
 
+    def _update_scale(self, value):
+        self.scale_label.configure(text=f"Scale: {int(round(value))}%")
+
     def _validated_inputs(self):
         value = self.fps_entry.get().strip()
         try:
@@ -287,22 +297,10 @@ class App(customtkinter.CTk):
             self._set_status("FPS must be a number between 1 and 50", error=True)
             return None
 
-        width_text = self.width_entry.get().strip()
-        max_width = None
-        if width_text:
-            try:
-                max_width = int(width_text)
-            except ValueError:
-                self._set_status("Max width must be an integer between 16 and 8192", error=True)
-                return None
-            if not 16 <= max_width <= 8192:
-                self._set_status("Max width must be an integer between 16 and 8192", error=True)
-                return None
-
         if not self.paths:
             self._set_status("No supported images found", error=True)
             return None
-        return fps, max_width
+        return fps
 
     def _start_render(self):
         if self._rendering:
@@ -310,7 +308,7 @@ class App(customtkinter.CTk):
         values = self._validated_inputs()
         if values is None:
             return
-        fps, max_width = values
+        fps = values
         out_path = filedialog.asksaveasfilename(
             parent=self, defaultextension=".gif",
             filetypes=(("GIF image", "*.gif"), ("All files", "*.*"))
@@ -326,11 +324,12 @@ class App(customtkinter.CTk):
         self._cancel = threading.Event()
         paths = list(self.paths)
         slider = int(round(self.compression_slider.get()))
+        scale = int(round(self.scale_slider.get())) / 100.0
 
         def worker():
             try:
                 render(
-                    paths, out_path, fps, slider, max_width=max_width,
+                    paths, out_path, fps, slider, scale=scale,
                     progress=lambda cur, total: self._queue.put(("progress", cur, total)),
                     cancel=self._cancel
                 )
@@ -348,7 +347,7 @@ class App(customtkinter.CTk):
         state = "normal" if enabled else "disabled"
         for widget in (
             self.folder_button, self.fps_entry, self.compression_slider,
-            self.width_entry, self.render_button
+            self.scale_slider, self.render_button
         ):
             widget.configure(state=state)
 
