@@ -2,9 +2,10 @@
 
 - Stage 1: Complete
 - Stage 2: Complete (GUI implementation; manual GUI verification pending)
-- Stage 3: Complete (README and static compliance review)
+- Stage 3: Complete (README and compliance review)
+- Resolution Slider / Rebranding: Complete
 
-Deviations or failures: Pytest is unavailable in the configured Python environment, so the automated acceptance suite could not be run. Python 3.12 syntax compilation passed; no window or App instance was opened.
+Verification: Pytest passed (9 tests) after the resolution slider and rebranding update. Python 3.12 syntax compilation passed. GUI and frozen-app manual checks remain unverified.
 
 ## SPEC sections 6–7 compliance
 
@@ -14,7 +15,7 @@ Each behavior was compared against `gif_compiler.py`.
 |---|---|
 | No folder chosen or zero images: rendering disabled; “No supported images found” | Implemented |
 | Empty, nonnumeric, or out-of-range FPS: block with required message | Implemented |
-| Invalid max width: block with a message | Implemented |
+| Resolution scale slider applies the selected percentage to output dimensions | Implemented |
 | Save As cancelled: silent abort | Implemented |
 | One image: allowed with single-frame note | Implemented |
 | Corrupt image: error status includes the Pillow exception and filename | Implemented |
